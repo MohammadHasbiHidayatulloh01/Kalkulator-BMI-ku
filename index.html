@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator BMI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            color: #333;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        #bmiCalculator {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            transition: transform 0.3s ease-in-out;
+        }
+        h1 {
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #2ecc71;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        label {
+            margin-top: 15px;
+            font-size: 18px;
+            color: #555;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #FFC107;
+            color: #333;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #FFA000;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #3498db;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        #obesityIndicator {
+            font-size: 24px;
+            margin-top: 10px;
+        }
+        footer {
+            margin-top: 20px;
+            color: #999;
+            text-align: center;
+        }
+        /* Animasi untuk tombol dan hasil perhitungan */
+        button.animate {
+            animation: buttonScale 0.3s ease-in-out;
+        }
+        #result.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        @keyframes buttonScale {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        /* Gaya tambahan untuk saran */
+        #suggestion {
+            margin-top: 20px;
+            text-align: left;
+            font-size: 16px;
+            color: #777;
+        }
+        /* Style untuk ikon */
+        i {
+            margin-right: 5px;
+        }
+        /* Gaya tambahan untuk strip penentu obesitas */
+        .strip {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .normal { background-color: #2ecc71; color: #fff; }
+        .overweight { background-color: #FFC107; color: #333; }
+        .obese { background-color: #e74c3c; color: #fff; }
+    </style>
+</head>
+<body>
+
+<div id="bmiCalculator">
+    <h1><i class="fas fa-weight"></i> Kalkulator BMI</h1>
+    <h2>By Mohammad Hasbi Hidayatulloh</h2>
+    <form id="bmiForm">
+        <label for="height">Tinggi (cm): </label>
+        <input type="number" id="height" name="height" required>
+
+        <label for="weight">Berat (kg): </label>
+        <input type="number" id="weight" name="weight" required>
+
+        <button type="button" onclick="calculateBMI()" class="animate"><i class="fas fa-calculator"></i> Hitung BMI</button>
+    </form>
+
+    <div id="result"></div>
+    <div id="obesityIndicator"></div>
+    <div id="suggestion"></div>
+    <footer>&copy; 2024 Mohammad Hasbi Hidayatulloh. All rights reserved.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+<script>
+    function calculateBMI() {
+        var height = document.getElementById('height').value / 100; // convert to meters
+        var weight = document.getElementById('weight').value;
+
+        if (height > 0 && weight > 0) {
+            var bmi = weight / (height * height);
+            var resultElement = document.getElementById('result');
+            var indicatorElement = document.getElementById('obesityIndicator');
+            var suggestionElement = document.getElementById('suggestion');
+            resultElement.innerHTML = '<h3>Hasil BMI Anda:</h3>' +
+                                      '<p>BMI: ' + bmi.toFixed(2) + '</p>' +
+                                      '<p>Interpretasi: ' + interpretBMI(bmi) + '</p>';
+            resultElement.classList.add('animate');
+
+            // Menambahkan strip penentu obesitas
+            var obesityIndicator = document.getElementById('obesityIndicator');
+            obesityIndicator.innerHTML = '<div class="strip ' + getObesityClass(bmi) + '">' + getObesityLabel(bmi) + '</div>';
+
+            // Menambahkan saran
+            suggestionElement.innerHTML = getSuggestion(bmi);
+        } else {
+            alert('Mohon masukkan tinggi dan berat yang valid.');
+        }
+    }
+
+    function interpretBMI(bmi) {
+        if (bmi < 18.5) {
+            return 'Berat badan kurang';
+        } else if (bmi < 24.9) {
+            return 'Berat badan normal';
+        } else if (bmi < 29.9) {
+            return 'Berat badan berlebih (Overweight)';
+        } else {
+            return 'Obesitas';
+        }
+    }
+
+    function getObesityLabel(bmi) {
+        if (bmi < 18.5) {
+            return 'Kurang Berat';
+        } else if (bmi < 24.9) {
+            return 'Normal';
+        } else if (bmi < 29.9) {
+            return 'Berlebih (Overweight)';
+        } else {
+            return 'Obesitas';
+        }
+    }
+
+    function getObesityClass(bmi) {
+        if (bmi < 18.5) {
+            return 'underweight';
+        } else if (bmi < 24.9) {
+            return 'normal';
+        } else if (bmi < 29.9) {
+            return 'overweight';
+        } else {
+            return 'obese';
+        }
+    }
+
+    function getSuggestion(bmi) {
+        if (bmi < 18.5) {
+            return 'Anda mungkin perlu mempertimbangkan untuk meningkatkan asupan nutrisi dan olahraga untuk mencapai berat badan yang sehat.';
+        } else if (bmi < 24.9) {
+            return 'Selamat! Anda memiliki berat badan yang normal. Pastikan untuk tetap menjaga pola makan sehat dan berolahraga secara teratur.';
+        } else if (bmi < 29.9) {
+            return 'Anda berada dalam kategori berat badan berlebih (Overweight). Pertimbangkan untuk mengatur pola makan dan meningkatkan aktivitas fisik.';
+        } else {
+            return 'Anda mengalami obesitas. Konsultasikan dengan dokter atau ahli gizi untuk membuat rencana yang tepat untuk menurunkan berat badan secara sehat.';
+        }
+    }
+</script>
+
+</body>
+</html>
